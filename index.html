@@ -1,13 +1,15 @@
 <!DOCTYPE html>
-<!-- saved from url=(0049)file:///D:/.DIVABHAWANA/INTERNET%20ART/MOUSE.html -->
-<html lang="id"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Finding Data</title>
 <style>
     body {
         margin: 0;
         overflow: hidden;
         font-family: 'Courier New', Courier, monospace;
+        touch-action: none;
     }
     canvas {
         display: block;
@@ -15,7 +17,7 @@
 </style>
 </head>
 <body>
-<canvas id="canvas" width="2552" height="1308"></canvas>
+<canvas id="canvas"></canvas>
 
 <script>
 const canvas = document.getElementById("canvas");
@@ -45,11 +47,31 @@ function resize() {
 }
 window.addEventListener("resize", resize);
 
+// ==== MOUSE ====
 window.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
 });
 
+// ==== TOUCH SUPPORT (HP / TABLET) ====
+canvas.addEventListener("touchstart", function(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    mouseX = touch.clientX;
+    mouseY = touch.clientY;
+
+    // Tap untuk ganti skema warna
+    schemeIndex = (schemeIndex + 1) % schemes.length;
+}, { passive: false });
+
+canvas.addEventListener("touchmove", function(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    mouseX = touch.clientX;
+    mouseY = touch.clientY;
+}, { passive: false });
+
+// ==== CLICK DESKTOP ====
 window.addEventListener("click", () => {
     schemeIndex = (schemeIndex + 1) % schemes.length;
 });
@@ -102,10 +124,10 @@ function updateAndDrawBlocks() {
             block.glitchTimer = 0;
         } else {
             if (block.highlight > 1) {
-                block.highlight *= 0.99; // delay fade
+                block.highlight *= 0.99;
             } else if (block.highlight > 0) {
                 block.highlight = 0;
-                block.glitchTimer = 100; // glitch setelah delay
+                block.glitchTimer = 100;
             }
         }
 
@@ -113,7 +135,7 @@ function updateAndDrawBlocks() {
         let blockColor = scheme.block;
 
         if (block.glitchTimer > 0) {
-            blockColor = cmykColors[Math.floor(Math.random() * 6)];
+            blockColor = cmykColors[Math.floor(Math.random() * cmykColors.length)];
             block.glitchTimer--;
         }
 
@@ -121,11 +143,11 @@ function updateAndDrawBlocks() {
         if (block.highlight > 0 || block.glitchTimer > 0) {
             ctx.fillStyle = blockColor;
             ctx.globalAlpha = block.highlight > 0 ? block.highlight : 1;
-            ctx.fillRect(block.x - 0, block.y - 0, block.width + 1, block.height + 2);
+            ctx.fillRect(block.x, block.y, block.width + 1, block.height + 2);
             ctx.globalAlpha = 1;
         }
 
-        // text tetap normal
+        // text
         const x1 = Math.floor(mouseX);
         const x2 = x1 + 10;
         const x3 = x1 + 20;
@@ -162,6 +184,5 @@ function animate() {
 resize();
 animate();
 </script>
-
-
-</body></html>
+</body>
+</html>
